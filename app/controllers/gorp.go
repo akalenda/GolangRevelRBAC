@@ -3,9 +3,9 @@ package controllers
 import (
 	"database/sql"
 	"github.com/go-gorp/gorp"
-	"github.com/revel/examples/booking2/app/models"
 	"github.com/revel/modules/db/app"
 	"github.com/revel/revel"
+	"github.com/akalenda/GolangRevelRBAC/app/models"
 )
 
 var (

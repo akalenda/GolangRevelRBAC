@@ -3,7 +3,7 @@ package app
 import (
 	"github.com/revel/revel"
 	"gopkg.in/mikespook/gorbac.v2"
-	"github.com/revel/examples/booking2/app/models"
+	"github.com/akalenda/GolangRevelRBAC/app/models"
 )
 
 var rbac = gorbac.New()

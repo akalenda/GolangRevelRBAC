@@ -6,6 +6,7 @@ import (
 	"github.com/revel/modules/db/app"
 	"github.com/revel/revel"
 	"github.com/akalenda/GolangRevelRBAC/app/models"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var (
@@ -22,12 +23,9 @@ func InitDB() {
 	dbmap.AddTable(models.Booking{}).SetKeys(true, "BookingId")
 
 	dbmap.TraceOn("[gorp]", revel.INFO)
-	checkErr(dbmap.CreateTablesIfNotExists())
+	CheckErr(dbmap.CreateTablesIfNotExists())
 
-	_, err := models.RegisterNewUser(dbmap, "admin", "admin", "administrator")
-	if err != nil && err.Error() != "User error: Username and password do not match" {
-		panic(err)
-	}
+	initAdminAccount(dbmap)
 
 	hotels := []*models.Hotel{
 		{HotelId: 0, Name: "Marriott Courtyard", Address: "Tower Pl, Buckhead", City: "Atlanta", State: "GA", Zip:"30305", Country:"USA", Price:120},
@@ -35,7 +33,20 @@ func InitDB() {
 		{HotelId: 0, Name: "Hotel Rouge", Address: "1315 16th St NW", City: "Washington",        State: "DC", Zip:"20036", Country:"USA", Price:250},
 	}
 	for _, hotel := range hotels {
-		checkErr(dbmap.Insert(hotel))
+		CheckErr(dbmap.Insert(hotel))
+	}
+}
+
+func initAdminAccount(dbmap *gorp.DbMap) {
+	var users []models.User
+	dbmap.Select(&users, "select * from User where Username=admin")
+	if len(users) == 0 {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte("admin"), bcrypt.DefaultCost)
+		u := models.User{Name: "Administrator", Username: "admin", Roles: "ADMIN", HashedPassword: string(hashedPassword)}
+		err = dbmap.Insert(&u)
+		if err != nil && err.Error() != "User error: Username and password do not match" {
+			panic(err)
+		}
 	}
 }
 
@@ -73,11 +84,4 @@ func (c *GorpController) Rollback() revel.Result {
 	}
 	c.Txn = nil
 	return nil
-}
-
-/* ********************* Helpers ******************* */
-func checkErr(err error) {
-	if err != nil {
-		panic(err)
-	}
 }

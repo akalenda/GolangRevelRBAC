@@ -9,7 +9,7 @@ import (
 	"errors"
 )
 
-type user struct {
+type User struct {
 	UserId        	int
 	Name          	string `db:",size:128"`
 	Username      	string `db:",size:32"`
@@ -17,19 +17,22 @@ type user struct {
 	HashedPassword	string
 }
 
+func (u *User) MatchesHashedPasswordTo(unhashedPassword string) bool {
+	return bcrypt.CompareHashAndPassword([]byte(u.HashedPassword), []byte(unhashedPassword)) == nil
+}
+
 func User_AddTable(dbmap *gorp.DbMap) {
-	dbmap.AddTable(user{}).SetKeys(true, "UserId")
+	dbmap.AddTable(User{}).SetKeys(true, "UserId")
 }
 
 /**
-NewUser attempts to construct a new user struct. It makes the assumption that the user is already in the system.
+NewUser attempts to construct a new User struct. It makes the assumption that the User is already in the system.
 It will return an error if there was a problem pulling from the database, if no users match the username, or if for
-some bizarre reason more than one user with that username was found.
+some bizarre reason more than one User with that username was found.
  */
-func NewRegisteredUser(dbmap *gorp.DbMap, username string, password string) (*user, error) {
-	var users []user
-	_, errDB := dbmap.Select(&users, "select * from user where Username=?", username)
-	hashedPassword, errHP := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+func GetUserFromDB(transaction *gorp.Transaction, username string) (*User, error) {
+	var users []User
+	_, errDB := transaction.Select(&users, "select * from User where Username=?", username)
 
 	if errDB != nil {
 		return nil, errDB
@@ -37,22 +40,20 @@ func NewRegisteredUser(dbmap *gorp.DbMap, username string, password string) (*us
 		return nil, errors.New("User error: Username not found")
 	} else if len(users) > 1 {
 		return &users[0], errors.New("Critical error: Multiple users found with same username")
-	} else if errHP != nil {
-		return &users[0], errDB
-	} else if string(hashedPassword) == users[0].HashedPassword {
-		return &users[0], errors.New("User error: Username and password do not match")
+	} else if &users[0] == nil {
+		return nil, errors.New("Error: WAT")
 	}
 	return &users[0], nil
 }
 
 /**
-RegisterNewUser creates a new user struct. It first ensures that a user with the given username does not already exist.
-It inserts the new user's information into the database, and validates the information they've given in the sense of
+RegisterNewUser creates a new User struct. It first ensures that a User with the given username does not already exist.
+It inserts the new User's information into the database, and validates the information they've given in the sense of
 its formatting. The password is not stored in the database, rather an encrypted version.
  */
-func RegisterNewUser(dbmap *gorp.DbMap, username string, password string, fullname string) (*user, error) {
-	var users []user
-	_, errDB := dbmap.Select(&users, "select * from user where Username=?", username)
+func RegisterNewUser(transaction *gorp.Transaction, username string, password string, fullname string) (*User, error) {
+	var users []User
+	_, errDB := transaction.Select(&users, "select * from User where Username=?", username)
 	hashedPassword, errHP := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
 	if errDB != nil {
@@ -63,8 +64,8 @@ func RegisterNewUser(dbmap *gorp.DbMap, username string, password string, fullna
 		return nil, errDB
 	}
 
-	u := user{Name: fullname, Username: username, Roles: "", HashedPassword: string(hashedPassword)}
-	errDB = dbmap.Insert(&u)
+	u := User{Name: fullname, Username: username, Roles: "", HashedPassword: string(hashedPassword)}
+	errDB = transaction.Insert(&u)
 
 	if errDB != nil {
 		return &u, errDB
@@ -72,13 +73,13 @@ func RegisterNewUser(dbmap *gorp.DbMap, username string, password string, fullna
 	return &u, nil
 }
 
-func (u *user) String() string {
-	return fmt.Sprintf("user(%s)", u.Username)
+func (u *User) String() string {
+	return fmt.Sprintf("User(%s)", u.Username)
 }
 
 var userRegex = regexp.MustCompile("^\\w*$")
 
-func (u *user) Validate(v *revel.Validation) {
+func (u *User) Validate(v *revel.Validation) {
 	v.Check(u.Username,
 		revel.Required{},
 		revel.MaxSize{15},
@@ -102,11 +103,11 @@ func ValidatePassword(v *revel.Validation, password string) *revel.ValidationRes
 
 /**
 AddRole is a method. My very first Golang method!
-It reads like this: "A function on u, which is a user,
+It reads like this: "A function on u, which is a User,
 is a method named addRole that receives role, which is
-a string, and returns a user."
+a string, and returns a User."
  */
-func (u *user) AddRole(role string) (*user, error) {
+func (u *User) AddRole(role string) (*User, error) {
 	if Role_isKnown(role) {
 		if len(u.Roles) == 0 {
 			u.Roles = role
@@ -118,6 +119,6 @@ func (u *user) AddRole(role string) (*user, error) {
 	return u, errors.New("Internal design error: '" + role + "' is not a known role.")
 }
 
-func (u *user) commitChangesToDB() {
+func (u *User) commitChangesToDB() {
 	// TODO
 }

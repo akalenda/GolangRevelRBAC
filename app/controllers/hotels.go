@@ -7,10 +7,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	
 	"github.com/revel/revel"
-    
-	"github.com/revel/examples/booking/app/models"
-	"github.com/revel/examples/booking/app/routes"
-	
+
+	"github.com/akalenda/GolangRevelRBAC/app/models"
+	"github.com/akalenda/GolangRevelRBAC/app/routes"
 )
 
 type Hotels struct {

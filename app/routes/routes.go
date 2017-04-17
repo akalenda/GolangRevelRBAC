@@ -69,18 +69,6 @@ func (_ tTestRunner) List(
 }
 
 
-type tJobs struct {}
-var Jobs tJobs
-
-
-func (_ tJobs) Status(
-		) string {
-	args := make(map[string]string)
-	
-	return revel.MainRouter.Reverse("Jobs.Status", args).URL
-}
-
-
 type tStatic struct {}
 var Static tStatic
 
@@ -110,6 +98,18 @@ func (_ tStatic) ServeModule(
 }
 
 
+type tJobs struct {}
+var Jobs tJobs
+
+
+func (_ tJobs) Status(
+		) string {
+	args := make(map[string]string)
+	
+	return revel.MainRouter.Reverse("Jobs.Status", args).URL
+}
+
+
 type tApplication struct {}
 var Application tApplication
 
@@ -136,12 +136,12 @@ func (_ tApplication) Register(
 }
 
 func (_ tApplication) SaveUser(
-		user interface{},
+		username string,
 		verifyPassword string,
 		) string {
 	args := make(map[string]string)
 	
-	revel.Unbind(args, "user", user)
+	revel.Unbind(args, "username", username)
 	revel.Unbind(args, "verifyPassword", verifyPassword)
 	return revel.MainRouter.Reverse("Application.SaveUser", args).URL
 }

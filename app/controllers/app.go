@@ -1,13 +1,9 @@
 package controllers
 
 import (
-	
-    "golang.org/x/crypto/bcrypt"
-	
-    "github.com/revel/revel"
-    
-	"github.com/revel/examples/booking/app/models"
-	"github.com/revel/examples/booking/app/routes"
+	"github.com/revel/revel"
+	"github.com/akalenda/GolangRevelRBAC/app/models"
+	"github.com/akalenda/GolangRevelRBAC/app/routes"
 )
 
 type Application struct {
@@ -15,8 +11,8 @@ type Application struct {
 }
 
 func (c Application) AddUser() revel.Result {
-	if user := c.connected(); user != nil {
-		c.ViewArgs["user"] = user
+	if u := c.connected(); u != nil {
+		c.ViewArgs["user"] = u
 	}
 	return nil
 }
@@ -26,20 +22,11 @@ func (c Application) connected() *models.User {
 		return c.ViewArgs["user"].(*models.User)
 	}
 	if username, ok := c.Session["user"]; ok {
-		return c.getUser(username)
+		u, err := models.GetUserFromDB(c.Txn, username)
+		CheckErr(err)
+		return u
 	}
 	return nil
-}
-
-func (c Application) getUser(username string) *models.User {
-	users, err := c.Txn.Select(models.User{}, `select * from User where Username = ?`, username)
-	if err != nil {
-		panic(err)
-	}
-	if len(users) == 0 {
-		return nil
-	}
-	return users[0].(*models.User)
 }
 
 func (c Application) Index() revel.Result {
@@ -54,46 +41,27 @@ func (c Application) Register() revel.Result {
 	return c.Render()
 }
 
-func (c Application) SaveUser(user models.User, verifyPassword string) revel.Result {
-	c.Validation.Required(verifyPassword)
-	c.Validation.Required(verifyPassword == user.Password).
-		Message("Password does not match")
-	user.Validate(c.Validation)
-
-	if c.Validation.HasErrors() {
-		c.Validation.Keep()
-		c.FlashParams()
-		return c.Redirect(routes.Application.Register())
-	}
-
-	user.HashedPassword, _ = bcrypt.GenerateFromPassword(
-		[]byte(user.Password), bcrypt.DefaultCost)
-	err := c.Txn.Insert(&user)
-	if err != nil {
-		panic(err)
-	}
-
-	c.Session["user"] = user.Username
-	c.Flash.Success("Welcome, " + user.Name)
+func (c Application) SaveUser(username string, verifyPassword string) revel.Result {
+	u, err := models.RegisterNewUser(c.Txn, username, verifyPassword, "placeholder")
+	CheckErr(err)
+	c.Session["user"] = username
+	c.Flash.Success("Welcome, " + u.Name)
 	return c.Redirect(routes.Hotels.Index())
 }
 
-func (c Application) Login(username, password string, remember bool) revel.Result {
-	user := c.getUser(username)
-	if user != nil {
-		err := bcrypt.CompareHashAndPassword(user.HashedPassword, []byte(password))
-		if err == nil {
-			c.Session["user"] = username
-			if remember {
-				c.Session.SetDefaultExpiration()
-			} else {
-				c.Session.SetNoExpiration()
-			}
-			c.Flash.Success("Welcome, " + username)
-			return c.Redirect(routes.Hotels.Index())
+func (c Application) Login(username string, password string, remember bool) revel.Result {
+	u, err := models.GetUserFromDB(c.Txn, username)
+	CheckErr(err)
+	if u.MatchesHashedPasswordTo(password) {
+		c.Session["user"] = username
+		if remember {
+			c.Session.SetDefaultExpiration()
+		} else {
+			c.Session.SetNoExpiration()
 		}
+		c.Flash.Success("Welcome, " + username)
+		return c.Redirect(routes.Hotels.Index())
 	}
-
 	c.Flash.Out["username"] = username
 	c.Flash.Error("Login failed")
 	return c.Redirect(routes.Application.Index())

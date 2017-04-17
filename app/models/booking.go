@@ -24,13 +24,13 @@ type Booking struct {
 	// Transient
 	CheckInDate  time.Time
 	CheckOutDate time.Time
-	User         *user
+	User         *User
 	Hotel        *Hotel
 }
 
 func Booking_addTableTo(dbm *gorp.DbMap) {
 	t := dbm.AddTable(Booking{}).SetKeys(true, "BookingId")
-	t.ColMap("user").Transient = true
+	t.ColMap("User").Transient = true
 	t.ColMap("Hotel").Transient = true
 	t.ColMap("CheckInDate").Transient = true
 	t.ColMap("CheckOutDate").Transient = true
@@ -102,11 +102,11 @@ func (b *Booking) PostGet(exe gorp.SqlExecutor) error {
 		err error
 	)
 
-	obj, err = exe.Get(user{}, b.UserId)
+	obj, err = exe.Get(User{}, b.UserId)
 	if err != nil {
 		return fmt.Errorf("Error loading a booking's u (%d): %s", b.UserId, err)
 	}
-	b.User = obj.(*user)
+	b.User = obj.(*User)
 
 	obj, err = exe.Get(Hotel{}, b.HotelId)
 	if err != nil {

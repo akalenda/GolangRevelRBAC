@@ -8,12 +8,12 @@ import (
 	_ "github.com/akalenda/GolangRevelRBAC/app"
 	controllers "github.com/akalenda/GolangRevelRBAC/app/controllers"
 	_ "github.com/akalenda/GolangRevelRBAC/app/jobs"
+	models "github.com/akalenda/GolangRevelRBAC/app/models"
 	tests "github.com/akalenda/GolangRevelRBAC/tests"
 	_ "github.com/mattn/go-sqlite3"
-	models "github.com/revel/examples/booking/app/models"
-	controllers1 "github.com/revel/modules/jobs/app/controllers"
+	controllers2 "github.com/revel/modules/jobs/app/controllers"
 	_ "github.com/revel/modules/jobs/app/jobs"
-	controllers2 "github.com/revel/modules/static/app/controllers"
+	controllers1 "github.com/revel/modules/static/app/controllers"
 	_ "github.com/revel/modules/testrunner/app"
 	controllers0 "github.com/revel/modules/testrunner/app/controllers"
 	"github.com/revel/revel/testing"
@@ -101,22 +101,7 @@ func main() {
 			
 		})
 	
-	revel.RegisterController((*controllers1.Jobs)(nil),
-		[]*revel.MethodType{
-			&revel.MethodType{
-				Name: "Status",
-				Args: []*revel.MethodArg{ 
-				},
-				RenderArgNames: map[int][]string{ 
-					28: []string{ 
-						"entries",
-					},
-				},
-			},
-			
-		})
-	
-	revel.RegisterController((*controllers2.Static)(nil),
+	revel.RegisterController((*controllers1.Static)(nil),
 		[]*revel.MethodType{
 			&revel.MethodType{
 				Name: "Serve",
@@ -140,6 +125,21 @@ func main() {
 			
 		})
 	
+	revel.RegisterController((*controllers2.Jobs)(nil),
+		[]*revel.MethodType{
+			&revel.MethodType{
+				Name: "Status",
+				Args: []*revel.MethodArg{ 
+				},
+				RenderArgNames: map[int][]string{ 
+					28: []string{ 
+						"entries",
+					},
+				},
+			},
+			
+		})
+	
 	revel.RegisterController((*controllers.Application)(nil),
 		[]*revel.MethodType{
 			&revel.MethodType{
@@ -154,7 +154,7 @@ func main() {
 				Args: []*revel.MethodArg{ 
 				},
 				RenderArgNames: map[int][]string{ 
-					50: []string{ 
+					37: []string{ 
 					},
 				},
 			},
@@ -163,14 +163,14 @@ func main() {
 				Args: []*revel.MethodArg{ 
 				},
 				RenderArgNames: map[int][]string{ 
-					54: []string{ 
+					41: []string{ 
 					},
 				},
 			},
 			&revel.MethodType{
 				Name: "SaveUser",
 				Args: []*revel.MethodArg{ 
-					&revel.MethodArg{Name: "user", Type: reflect.TypeOf((*models.User)(nil)) },
+					&revel.MethodArg{Name: "username", Type: reflect.TypeOf((*string)(nil)) },
 					&revel.MethodArg{Name: "verifyPassword", Type: reflect.TypeOf((*string)(nil)) },
 				},
 				RenderArgNames: map[int][]string{ 
@@ -203,7 +203,7 @@ func main() {
 				Args: []*revel.MethodArg{ 
 				},
 				RenderArgNames: map[int][]string{ 
-					41: []string{ 
+					40: []string{ 
 						"bookings",
 					},
 				},
@@ -216,7 +216,7 @@ func main() {
 					&revel.MethodArg{Name: "page", Type: reflect.TypeOf((*int)(nil)) },
 				},
 				RenderArgNames: map[int][]string{ 
-					62: []string{ 
+					61: []string{ 
 						"hotels",
 						"search",
 						"size",
@@ -231,7 +231,7 @@ func main() {
 					&revel.MethodArg{Name: "id", Type: reflect.TypeOf((*int)(nil)) },
 				},
 				RenderArgNames: map[int][]string{ 
-					93: []string{ 
+					92: []string{ 
 						"title",
 						"hotel",
 					},
@@ -242,7 +242,7 @@ func main() {
 				Args: []*revel.MethodArg{ 
 				},
 				RenderArgNames: map[int][]string{ 
-					97: []string{ 
+					96: []string{ 
 					},
 				},
 			},
@@ -262,7 +262,7 @@ func main() {
 					&revel.MethodArg{Name: "booking", Type: reflect.TypeOf((*models.Booking)(nil)) },
 				},
 				RenderArgNames: map[int][]string{ 
-					148: []string{ 
+					147: []string{ 
 						"title",
 						"hotel",
 						"booking",
@@ -283,7 +283,7 @@ func main() {
 					&revel.MethodArg{Name: "id", Type: reflect.TypeOf((*int)(nil)) },
 				},
 				RenderArgNames: map[int][]string{ 
-					167: []string{ 
+					166: []string{ 
 						"title",
 						"hotel",
 					},
@@ -293,13 +293,9 @@ func main() {
 		})
 	
 	revel.DefaultValidationKeys = map[string]map[int]string{ 
-		"github.com/akalenda/GolangRevelRBAC/app/controllers.Application.SaveUser": { 
-			58: "verifyPassword",
-			59: "verifyPassword",
-		},
 		"github.com/akalenda/GolangRevelRBAC/app/controllers.Hotels.SaveSettings": { 
-			102: "verifyPassword",
-			104: "verifyPassword",
+			101: "verifyPassword",
+			103: "verifyPassword",
 		},
 		"github.com/akalenda/GolangRevelRBAC/app/models.(*Hotel).Validate": { 
 			22: "hotel.Name",
@@ -309,9 +305,9 @@ func main() {
 			41: "hotel.Zip",
 			47: "hotel.Country",
 		},
-		"github.com/akalenda/GolangRevelRBAC/app/models.(*user).Validate": { 
-			87: "u.Username",
-			92: "u.Name",
+		"github.com/akalenda/GolangRevelRBAC/app/models.(*User).Validate": { 
+			88: "u.Username",
+			93: "u.Name",
 		},
 		"github.com/akalenda/GolangRevelRBAC/app/models.Booking.Validate": { 
 			44: "booking.User",
@@ -322,7 +318,7 @@ func main() {
 			56: "booking.NameOnCard",
 		},
 		"github.com/akalenda/GolangRevelRBAC/app/models.ValidatePassword": { 
-			100: "password",
+			101: "password",
 		},
 	}
 	testing.TestSuites = []interface{}{ 

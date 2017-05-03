@@ -30,6 +30,35 @@ func (_ tGorpController) Rollback(
 }
 
 
+type tStatic struct {}
+var Static tStatic
+
+
+func (_ tStatic) Serve(
+		prefix string,
+		filepath string,
+		) string {
+	args := make(map[string]string)
+	
+	revel.Unbind(args, "prefix", prefix)
+	revel.Unbind(args, "filepath", filepath)
+	return revel.MainRouter.Reverse("Static.Serve", args).URL
+}
+
+func (_ tStatic) ServeModule(
+		moduleName string,
+		prefix string,
+		filepath string,
+		) string {
+	args := make(map[string]string)
+	
+	revel.Unbind(args, "moduleName", moduleName)
+	revel.Unbind(args, "prefix", prefix)
+	revel.Unbind(args, "filepath", filepath)
+	return revel.MainRouter.Reverse("Static.ServeModule", args).URL
+}
+
+
 type tTestRunner struct {}
 var TestRunner tTestRunner
 
@@ -66,35 +95,6 @@ func (_ tTestRunner) List(
 	args := make(map[string]string)
 	
 	return revel.MainRouter.Reverse("TestRunner.List", args).URL
-}
-
-
-type tStatic struct {}
-var Static tStatic
-
-
-func (_ tStatic) Serve(
-		prefix string,
-		filepath string,
-		) string {
-	args := make(map[string]string)
-	
-	revel.Unbind(args, "prefix", prefix)
-	revel.Unbind(args, "filepath", filepath)
-	return revel.MainRouter.Reverse("Static.Serve", args).URL
-}
-
-func (_ tStatic) ServeModule(
-		moduleName string,
-		prefix string,
-		filepath string,
-		) string {
-	args := make(map[string]string)
-	
-	revel.Unbind(args, "moduleName", moduleName)
-	revel.Unbind(args, "prefix", prefix)
-	revel.Unbind(args, "filepath", filepath)
-	return revel.MainRouter.Reverse("Static.ServeModule", args).URL
 }
 
 
@@ -164,6 +164,29 @@ func (_ tApplication) Logout(
 	args := make(map[string]string)
 	
 	return revel.MainRouter.Reverse("Application.Logout", args).URL
+}
+
+
+type tUserProjects struct {}
+var UserProjects tUserProjects
+
+
+func (_ tUserProjects) GETIndex(
+		) string {
+	args := make(map[string]string)
+	
+	return revel.MainRouter.Reverse("UserProjects.GETIndex", args).URL
+}
+
+func (_ tUserProjects) POSTIndex(
+		projectName string,
+		projectDescription string,
+		) string {
+	args := make(map[string]string)
+	
+	revel.Unbind(args, "projectName", projectName)
+	revel.Unbind(args, "projectDescription", projectDescription)
+	return revel.MainRouter.Reverse("UserProjects.POSTIndex", args).URL
 }
 
 

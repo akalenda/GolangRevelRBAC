@@ -4,14 +4,12 @@
       <root url="file://$PROJECT_DIR$/../../../gopkg.in" />
       <root url="file://$PROJECT_DIR$/../.." />
       <root url="file://$PROJECT_DIR$/../../../golang.org" />
-      <root url="file://$PROJECT_DIR$/../../../myapp" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
       <root url="file://$PROJECT_DIR$/../../../gopkg.in" />
       <root url="file://$PROJECT_DIR$/../.." />
       <root url="file://$PROJECT_DIR$/../../../golang.org" />
-      <root url="file://$PROJECT_DIR$/../../../myapp" />
     </SOURCES>
     <excluded>
       <root url="file://$PROJECT_DIR$" />

@@ -3,25 +3,28 @@
 
 <div id="login">
 
-  (try with demo/demo)
-
-  <form action="{{url "Application.Login"}}" id="formLogin" method="POST">
-    <p class="field">
-      <label>Login Name:</label>
-      <input type="text" name="username" size="19" value="{{.flash.username}}" />
-    </p>
-    <p class="field">
-      <label>Password:</label>
-      <input type="password" name="password" size="19"/>
-    </p>
-    <p class="field">
-      <label>Remember:</label>
-      <input type="checkbox" name="remember" value="true"/>
-    </p>
-    <p class="buttons">
-      <input type="submit" value="Account login" />
-    </p>
-  </form>
+  <p><div class="jumbotron">
+    <form action='{{url "Application.Login"}}' id="formLogin" method="POST">
+      <p class="field">
+        <label>Login Name:
+          <input type="text" name="username" size="19" value="{{.flash.username}}"/>
+        </label>
+      </p>
+      <p class="field">
+        <label>Password:
+          <input type="password" name="password" size="19"/>
+        </label>
+      </p>
+      <p class="field">
+        <label>Remember me:
+          <input type="checkbox" name="remember" value="true"/>
+        </label>
+      </p>
+      <p class="buttons">
+        <input type="submit" class="btn btn-lg btn-success" value="Account login" />
+      </p>
+    </form>
+  </div></p>
 
   <p>
     <a href="{{url "Application.Register"}}">Register New User</a>

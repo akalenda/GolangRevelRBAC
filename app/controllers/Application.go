@@ -4,6 +4,7 @@ import (
 	"github.com/revel/revel"
 	"github.com/akalenda/GolangRevelRBAC/app/models"
 	"github.com/akalenda/GolangRevelRBAC/app/routes"
+	"github.com/akalenda/GolangRevelRBAC/app/helpers"
 )
 
 type Application struct {
@@ -23,7 +24,7 @@ func (c Application) connected() *models.User {
 	}
 	if username, ok := c.Session["user"]; ok {
 		u, err := models.GetUserFromDB(c.Txn, username)
-		CheckErr(err)
+		helpers.CheckErr(err)
 		return u
 	}
 	return nil
@@ -31,7 +32,7 @@ func (c Application) connected() *models.User {
 
 func (c Application) Index() revel.Result {
 	if c.connected() != nil {
-		return c.Redirect(routes.Hotels.Index())
+		return c.Redirect(routes.UserProjects.GETIndex())
 	}
 	c.Flash.Error("Please log in first")
 	return c.Render()
@@ -43,7 +44,7 @@ func (c Application) Register() revel.Result {
 
 func (c Application) SaveUser(username string, verifyPassword string) revel.Result {
 	u, err := models.RegisterNewUser(c.Txn, username, verifyPassword, "placeholder")
-	CheckErr(err)
+	helpers.CheckErr(err)
 	c.Session["user"] = username
 	c.Flash.Success("Welcome, " + u.Name)
 	return c.Redirect(routes.Hotels.Index())
@@ -51,7 +52,7 @@ func (c Application) SaveUser(username string, verifyPassword string) revel.Resu
 
 func (c Application) Login(username string, password string, remember bool) revel.Result {
 	u, err := models.GetUserFromDB(c.Txn, username)
-	CheckErr(err)
+	helpers.CheckErr(err)
 	if u.MatchesHashedPasswordTo(password) {
 		c.Session["user"] = username
 		if remember {

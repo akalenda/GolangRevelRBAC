@@ -18,6 +18,8 @@ GET     /settings                               Hotels.Settings
 POST    /settings                               Hotels.SaveSettings
 POST    /login                                  Application.Login
 GET     /logout                                 Application.Logout
+GET     /userProjects                           UserProjects.GETIndex
+POST    /userProjects                           UserProjects.POSTIndex
 
 # Map static resources from the /app/public folder to the /public path
 GET     /public/*filepath                       Static.Serve("public")

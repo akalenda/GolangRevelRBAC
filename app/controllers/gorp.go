@@ -7,34 +7,26 @@ import (
 	"github.com/revel/revel"
 	"github.com/akalenda/GolangRevelRBAC/app/models"
 	"golang.org/x/crypto/bcrypt"
+	"github.com/akalenda/GolangRevelRBAC/app/helpers"
 )
 
-var (
-	dbmap *gorp.DbMap
-)
+var dbMap *gorp.DbMap
 
 func InitDB() {
 	db.Init()
-	dbmap = &gorp.DbMap{Db: db.Db, Dialect: gorp.SqliteDialect{}}
+	dbMap = &gorp.DbMap{Db: db.Db, Dialect: gorp.SqliteDialect{}}
 
-	models.User_AddTable(dbmap)
-	models.UserProject_AddTable(dbmap)
-	dbmap.AddTable(models.Hotel{}  ).SetKeys(true, "HotelId")
-	dbmap.AddTable(models.Booking{}).SetKeys(true, "BookingId")
+	models.User_AddTable(dbMap)
+	models.UserProject_InitTable(dbMap)
+	dbMap.AddTable(models.Hotel{}  ).SetKeys(true, "HotelId")
+	dbMap.AddTable(models.Booking{}).SetKeys(true, "BookingId")
 
-	dbmap.TraceOn("[gorp]", revel.INFO)
-	CheckErr(dbmap.CreateTablesIfNotExists())
+	dbMap.TraceOn("[gorp]", revel.INFO)
+	helpers.CheckErr(dbMap.CreateTablesIfNotExists())
 
-	initAdminAccount(dbmap)
-
-	hotels := []*models.Hotel{
-		{HotelId: 0, Name: "Marriott Courtyard", Address: "Tower Pl, Buckhead", City: "Atlanta", State: "GA", Zip:"30305", Country:"USA", Price:120},
-		{HotelId: 0, Name: "W Hotel", Address: "Union Square, Manhattan", City: "New York",      State: "NY", Zip:"10011", Country:"USA", Price:450},
-		{HotelId: 0, Name: "Hotel Rouge", Address: "1315 16th St NW", City: "Washington",        State: "DC", Zip:"20036", Country:"USA", Price:250},
-	}
-	for _, hotel := range hotels {
-		CheckErr(dbmap.Insert(hotel))
-	}
+	initAdminAccount(dbMap)
+	initHotels(dbMap)
+	models.UserProject_InitAdminExample(dbMap)
 }
 
 func initAdminAccount(dbmap *gorp.DbMap) {
@@ -50,13 +42,24 @@ func initAdminAccount(dbmap *gorp.DbMap) {
 	}
 }
 
+func initHotels(dbmap *gorp.DbMap) {
+	hotels := []*models.Hotel{
+		{HotelId: 0, Name: "Marriott Courtyard", Address: "Tower Pl, Buckhead", City: "Atlanta", State: "GA", Zip:"30305", Country:"USA", Price:120},
+		{HotelId: 0, Name: "W Hotel", Address: "Union Square, Manhattan", City: "New York",      State: "NY", Zip:"10011", Country:"USA", Price:450},
+		{HotelId: 0, Name: "Hotel Rouge", Address: "1315 16th St NW", City: "Washington",        State: "DC", Zip:"20036", Country:"USA", Price:250},
+	}
+	for _, hotel := range hotels {
+		helpers.CheckErr(dbmap.Insert(hotel))
+	}
+}
+
 type GorpController struct {
 	*revel.Controller
 	Txn *gorp.Transaction
 }
 
 func (c *GorpController) Begin() revel.Result {
-	txn, err := dbmap.Begin()
+	txn, err := dbMap.Begin()
 	if err != nil {
 		panic(err)
 	}

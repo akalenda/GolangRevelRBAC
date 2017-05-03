@@ -1,0 +1,43 @@
+{{set . "title" "Search"}}
+{{template "header.html" .}}
+
+<h1>User projects</h1>
+
+{{if not .projectList}}
+<p>
+    No user projects found
+</p>
+{{else}}
+<table>
+    <thead>
+        <tr>
+            <th>UserProjectId</th>
+            <th>OwnerUsername</th>
+            <th>Name</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    {{range .projectList}}
+    <tr>
+        <td>{{.UserProjectId}}</td>
+        <td>{{.OwnerUsername}}</td>
+        <td>{{.Name}}</td>
+        <td>{{.Description}}</td>
+    </tr>
+    {{end}}
+</table>
+{{end}}
+<form action='/userProjects' id="formNewProject" method="POST">
+    <div class="input-group">
+        <span class="input-group-addon">Name</span>
+        <input name="projectName" type="text" class="form-control" placeholder="Give your project a name">
+    </div>
+
+    <div class="input-group">
+        <span class="input-group-addon">Description</span>
+        <input name="projectDescription" type="text" class="form-control" placeholder="Describe project here">
+    </div>
+    <input type="submit" class="btn btn-lg btn-success" value="+">
+</form>
+
+{{template "footer.html" .}}

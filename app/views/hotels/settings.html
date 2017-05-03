@@ -3,7 +3,7 @@
 
 <h1>Change your password</h1>
 
-<form method="POST" action="{{url "Hotels.SaveSettings"}}">
+<form method="POST" action='{{url "Hotels.SaveSettings"}}'>
   {{with $field := field "password" .}}
     <p class="{{$field.ErrorClass}}">
       <strong>Password:</strong>
@@ -20,7 +20,7 @@
   {{end}}
 
   <p class="buttons">
-    <input type="submit" value="Save"> <a href="{{url "Hotels.Index"}}">Cancel</a>
+    <input type="submit" value="Save"> <a href='{{url "Hotels.Index"}}'>Cancel</a>
   </p>
 </form>
 

@@ -2,10 +2,13 @@ Forward
 ===============================
 
 This is my own simple app which uses the Booking sample app from
-the Revel (web framework for Golang) as a starting point. Modifications
-I have made of the sample app are not reflected in this readme. I also
+the Revel (web framework for Golang) as a starting point. Most of
+the code in here is not my own work. For that matter, neither is the
+rest of this read-me.
+
+Modifications I have made of the sample app are not reflected in this readme. I also
 have not checked on how this code would be licensed yet, as it would be 
-derivative of what Revel; therefore, copy it at your own risk.
+derivative of what Revel uses; therefore, copy it at your own risk.
 
 Hotel Bookings 
 ===============================
